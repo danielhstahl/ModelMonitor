@@ -12,6 +12,12 @@ import org.json4s.jackson.Serialization.{read, write}
 import java.io._
 import scala.io.Source
 
+
+case class FieldsBins(
+    fields: Map[String, Map[String, Any]],
+    numNumericalBins: Int
+)
+
 object ConceptDrift {
     final val SQRT2=math.sqrt(2.0)
     final val NUM_BINS=3
@@ -94,18 +100,25 @@ object ConceptDrift {
         return frame.collect.toArray.map(r=>(r.getString(0), r.getLong(1).toDouble/n)).toMap
     }
 
+    def getColumnNameAndTypeArray(
+        trainingDistributions:FieldsBins
+    ):Array[(String, String)]={
+        trainingDistributions.fields.map({case (key, value)=>{
+            (key, value("type").asInstanceOf[String])
+        }}).toArray
+    }
 
     def getDistributionsHelper(
         computeMinMax: (DataFrame, Array[String])=>Map[String, AnyVal],
         getNumericDistribution: (DataFrame, String, Array[Double], Long)=>Array[Double],
         getCategoricalDistribution: (DataFrame, String, Long)=>Map[String, Double],
         numBins: Int
-    ):(DataFrame, Array[(String, String)])=>Map[String, Any]={
+    ):(DataFrame, Array[(String, String)])=>FieldsBins={
         (sparkDataFrame: DataFrame, columnNameAndTypeArray:Array[(String, String)])=>{
             val numericColumnArray=getNamesOfNumericColumns(columnNameAndTypeArray)
             val minMaxArray=getInitialElementIfNoNumeric(numericColumnArray, columnNameAndTypeArray)
             val minAndMax=computeMinMax(sparkDataFrame, minMaxArray)
-            val n=minAndMax(s"count(${minMaxArray(0)})").asInstanceOf[Long] //make sure to test with all numeric and all categorical
+            val n=minAndMax(s"count(${minMaxArray(0)})").asInstanceOf[Long] 
             val numericalBins=if (numBins==0) math.max(math.floor(math.sqrt(n)), NUM_BINS).toInt else numBins
             val fields=columnNameAndTypeArray.map({case (name, columnType)=>(
                 name, 
@@ -126,10 +139,11 @@ object ConceptDrift {
                     "type"->columnType
                 )
             )}).toMap
-            Map(
+            FieldsBins(fields, numericalBins)
+            /*Map(
                 "fields"->fields,
                 "numNumericalBins"->numericalBins
-            )
+            )*/
         }
     }
 
@@ -137,7 +151,7 @@ object ConceptDrift {
         computeMinMax, getNumericDistribution, getCategoricalDistribution, 0
     )
 
-    def saveDistribution(distribution:Map[String, Any], file:String):Boolean={
+    def saveDistribution(distribution:FieldsBins, file:String):Boolean={
         implicit val formats = DefaultFormats
         val f = new File(file)
         val bw = new BufferedWriter(new FileWriter(f))
@@ -145,14 +159,46 @@ object ConceptDrift {
         bw.close()
         return true
     }
-    def loadDistribution(file:String):Map[String, Any]={
-        implicit val formats = DefaultFormats
+    def loadDistribution(file:String):FieldsBins={
+        implicit val json4sFormats: Formats = DefaultFormats.withLong
         val bufSrc=Source.fromFile(file)
         val fileContents =bufSrc.getLines.mkString
         bufSrc.close
-        return parse(fileContents).extract[Map[String, Any]]
+        return parse(fileContents).extract[FieldsBins]
         
     }
-    
+
+    def compareDistributions(
+        trainingDistributions:Map[String, Map[String, Any]],
+        currentDistributions:Map[String, Map[String, Any]]
+    ):Map[String, Double]={
+        trainingDistributions.map({ case (key, value)=>{
+            (
+                key, 
+                if(value("type").asInstanceOf[String]==ColumnType.Numeric.toString) hellingerNumerical(
+                    value("distribution").asInstanceOf[Array[Double]],
+                    currentDistributions(key)("distribution").asInstanceOf[Array[Double]]
+                ) 
+                else hellingerCategorical(
+                    value("distribution").asInstanceOf[Map[String, Double]],
+                    currentDistributions(key)("distribution").asInstanceOf[Map[String, Double]]
+                )
+            )
+        }}).toMap
+    }
+    def getNewDistributionsAndCompare(
+        sparkDataFrame: DataFrame,
+        trainingDistributions: FieldsBins
+    ):Map[String, Double]={
+        val columnNameAndTypeArray=getColumnNameAndTypeArray(trainingDistributions)
+        val currentDistributions=getDistributionsHelper(
+            computeMinMax, getNumericDistribution, getCategoricalDistribution,
+            trainingDistributions.numNumericalBins
+        )(sparkDataFrame, columnNameAndTypeArray)
+        compareDistributions(
+            trainingDistributions.fields, 
+            currentDistributions.fields
+        )
+    }
 
 }
