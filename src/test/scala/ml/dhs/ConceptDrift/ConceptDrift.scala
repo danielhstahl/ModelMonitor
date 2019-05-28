@@ -74,28 +74,28 @@ class GetColumnNameAndTypeArrayTest extends FunSuite {
     test("it returns name and type"){
         val distribution=FieldsBins(
             Map(
-                "actioncode" -> Map(
-                    "distribution" -> Map(
+                "actioncode" -> DistributionHolder(
+                    Right(Map(
                         "Closed with non-monetary relief"->0.3333333333333333,
                         "Closed with monetary relief"->0.5,
                         "Closed with explanation"->0.16666666666666666
-                    ),                    
-                    "type" -> ColumnType.Categorical.toString
+                    )),      
+                    ColumnType.Categorical.toString        
                 ),
-                "origin" -> Map(
-                    "distribution" -> Map(
+                "origin" -> DistributionHolder(
+                    Right(Map(
                         "Branch"->0.6666666666666666,
                         "Customer Meeting"->0.3333333333333333
-                    ),
-                    "type" -> ColumnType.Categorical.toString
+                    )),
+                    ColumnType.Categorical.toString
                 ),
-                "exampleNumeric" -> Map(
-                    "distribution" -> Array(
+                "exampleNumeric" -> DistributionHolder(
+                    Left(Array(
                         0.16666666666666666,
                         0.6666666666666666,
                         0.16666666666666666
-                    ),
-                    "type" -> ColumnType.Numeric.toString
+                    )),
+                    ColumnType.Numeric.toString
                 )
             ),
             3
@@ -224,10 +224,6 @@ class GetCategoricalDistributionTest extends FunSuite with DataFrameSuiteBase /*
             "Branch"->0.666666666666666666,
             "Customer Meeting"->0.333333333333333333
         )
-        /*for ((e, r) <- expected.zip(result)){
-            assert(e("origin") === r("origin"))
-            assert(e("frequency") === r("frequency"))
-        }*/
         assert(result("Branch")===expected("Branch"))
         assert(result("Customer Meeting")===expected("Customer Meeting"))
     }
@@ -246,33 +242,33 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         val results=ConceptDrift.getDistributions(
             trainDataset, columnNameAnyTypeArray
         )
-        val expected=Map(
-            "fields" -> Map(
-                "actioncode" -> Map(
-                    "distribution" -> Map(
+        val expected=FieldsBins(
+            Map(
+                "actioncode" -> DistributionHolder(
+                    Right(Map(
                         "Closed with non-monetary relief"->0.3333333333333333,
                         "Closed with monetary relief"->0.5,
                         "Closed with explanation"->0.16666666666666666
-                    ),                    
-                    "type" -> ColumnType.Categorical.toString
+                    )),                    
+                    ColumnType.Categorical.toString
                 ),
-                "origin" -> Map(
-                    "distribution" -> Map(
+                "origin" -> DistributionHolder(
+                    Right(Map(
                         "Branch"->0.6666666666666666,
                         "Customer Meeting"->0.3333333333333333
-                    ),
-                    "type" -> ColumnType.Categorical.toString
+                    )),
+                    ColumnType.Categorical.toString
                 ),
-                "exampleNumeric" -> Map(
-                    "distribution" -> Array(
+                "exampleNumeric" -> DistributionHolder(
+                    Left(Array(
                         0.16666666666666666,
                         0.6666666666666666,
                         0.16666666666666666
-                    ),
-                    "type" -> ColumnType.Numeric.toString
+                    )),
+                    ColumnType.Numeric.toString
                 )
             ),
-            "numNumericalBins"->3
+            3
         )
         implicit val formats = DefaultFormats
         val expectedJson=write(expected)
@@ -298,7 +294,7 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
                         0.6666666666666666,
                         0.16666666666666666
                     ),
-                    "type" -> ColumnType.Numeric.toString
+                    "columnType" -> ColumnType.Numeric.toString
                 )
             ),
             "numNumericalBins"->3
@@ -328,14 +324,14 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
                         "Closed with monetary relief"->0.5,
                         "Closed with explanation"->0.16666666666666666
                     ),                    
-                    "type" -> ColumnType.Categorical.toString
+                    "columnType" -> ColumnType.Categorical.toString
                 ),
                 "origin" -> Map(
                     "distribution" -> Map(
                         "Branch"->0.6666666666666666,
                         "Customer Meeting"->0.3333333333333333
                     ),
-                    "type" -> ColumnType.Categorical.toString
+                    "columnType" -> ColumnType.Categorical.toString
                 )
             ),
             "numNumericalBins"->3
@@ -355,28 +351,28 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
         import sqlCtx.implicits._
         val testDataset=CreateDataTests.create_test_dataset(sc, sqlCtx)
         val distribution=FieldsBins(Map(
-                "actioncode" -> Map(
-                    "distribution" -> Map(
+                "actioncode" -> DistributionHolder(
+                    Right(Map(
                         "Closed with non-monetary relief"->0.3333333333333333,
                         "Closed with monetary relief"->0.5,
                         "Closed with explanation"->0.16666666666666666
-                    ),                    
-                    "type" -> ColumnType.Categorical.toString
+                    )),                    
+                    ColumnType.Categorical.toString
                 ),
-                "origin" -> Map(
-                    "distribution" -> Map(
+                "origin" -> DistributionHolder(
+                    Right(Map(
                         "Branch"->0.6666666666666666,
                         "Customer Meeting"->0.3333333333333333
-                    ),
-                    "type" -> ColumnType.Categorical.toString
+                    )),
+                    ColumnType.Categorical.toString
                 ),
-                "exampleNumeric" -> Map(
-                    "distribution" -> Array(
+                "exampleNumeric" -> DistributionHolder(
+                    Left(Array(
                         0.16666666666666666,
                         0.6666666666666666,
                         0.16666666666666666
-                    ),
-                    "type" -> ColumnType.Numeric.toString
+                    )),
+                    ColumnType.Numeric.toString
                 )
             ),
             3
