@@ -9,6 +9,7 @@ version := "0.0.1"
 fork in Test := true
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
 parallelExecution in Test := false
+
 val sparkVersion = "2.3.0"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
