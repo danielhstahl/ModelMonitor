@@ -5,8 +5,8 @@ scala:
 
 script:
   - sbt clean coverage test coverageReport
+  - rm -rf ./target/scala-2.11/coverage-report
   - rm -rf ./target/scala-2.11/scoverage-data
-  - rm -rf ./target/scala-2.11/scoverage-report
   - rm -rf ./target/scala-2.11/resolution-cache
 
 after_success:
