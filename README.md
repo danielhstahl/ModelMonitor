@@ -1,3 +1,12 @@
+| [Linux][lin-link] |  [Codecov][cov-link]   |
+| :---------------: |  :-------------------: |
+| ![lin-badge]      |  ![cov-badge]          |
+
+[lin-badge]: https://travis-ci.com/phillyfan1138/ModelMonitor.svg?branch=master "Travis build status"
+[lin-link]:  https://travis-ci.com/phillyfan1138/ModelMonitor "Travis build status"
+[cov-badge]: https://codecov.io/gh/phillyfan1138/ModelMonitor/branch/master/graph/badge.svg
+[cov-link]:  https://codecov.io/gh/phillyfan1138/ModelMonitor
+
 # Scala code for Model Monitoring in spark
 
 This library contains two monitoring capabilities: Concept Drift monitoring, and State Space Exploration.  Concept drift monitors how the distribution of inputs changes over time.  State Space Exploration simulates from the possible inputs and performs PCA to help plot predictions in three dimensions.  
