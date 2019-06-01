@@ -1,4 +1,0 @@
-ignore:
-  - "./target/scala-2.11/resolution-cache/reports/ml.dhs-modelmonitoring_2.11-scoveragePlugin.xml"
-  - "./target/scala-2.11/scoverage-data/scoverage.coverage.xml"
-  - "./target/scala-2.11/scoverage-report/scoverage.xml"
