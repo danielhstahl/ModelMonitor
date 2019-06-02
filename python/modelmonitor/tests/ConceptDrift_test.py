@@ -64,5 +64,7 @@ class TestEndToEndIntegration:
             ('origin', 'Categorical'),
             ('examplenumeric', 'Numeric'),
         ]
-        distribution=cdf.getDistributions(self.train_dataset, columnNameAndTypeArray)
+        cdf.saveDistribution(self.train_dataset, columnNameAndTypeArray, "./test_py.json")
+        results=cdf.getNewDistributionsAndCompare(self.test_dataset, "./test_py.json")
+        print(results)
         

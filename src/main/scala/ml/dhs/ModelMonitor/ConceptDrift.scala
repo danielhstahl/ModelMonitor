@@ -46,10 +46,14 @@ object ConceptDrift {
     */
     def computeBreaks(min: Double, max: Double, numBins: Int):Array[Double]={
         val binWidth:Double=(max-min)/numBins
-        val breaks=Array.tabulate(numBins+1)(i => min+binWidth*i)
-        breaks(0)=Double.NegativeInfinity
-        breaks(numBins)=Double.PositiveInfinity
-        return breaks
+        return Array.tabulate(numBins+1)(i => if(i==0){
+                Double.NegativeInfinity
+            } else if (i==numBins){
+                Double.PositiveInfinity
+            } else {
+                min+binWidth*i
+            }
+        )
     }
     /**
     * Helper function
@@ -258,9 +262,14 @@ object ConceptDrift {
     * @param columnNameAndTypeArray Names and types for
     * each variable included in the model.
     */
-    def getDistributions=getDistributionsHelper(
-        computeMinMax, getNumericDistribution, getCategoricalDistribution, 0
-    )
+    def getDistributions(
+        sparkDataFrame:DataFrame, 
+        columnNameAndTypeArray:Array[ColumnDescription]
+    ):FieldsBins={
+        getDistributionsHelper(
+            computeMinMax, getNumericDistribution, getCategoricalDistribution, 0
+        )(sparkDataFrame, columnNameAndTypeArray)
+    }
 
     /**
     * Main function to save the summary at model training

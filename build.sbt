@@ -24,6 +24,6 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-mllib" % sparkVersion,
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.12.0" % "test",
-  "org.json4s" %% "json4s-native" % "3.6.6"
+  "org.json4s" %% "json4s-native" % "3.2.11"
 )
 
