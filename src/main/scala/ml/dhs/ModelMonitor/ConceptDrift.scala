@@ -21,6 +21,11 @@ case class FieldsBins(
     numNumericalBins: Int
 )
 
+case class ColumnDescription(
+    name:String,
+    columnType:String
+)
+
 /**
   * A class to help perform identify and track concept drift.
   *
@@ -69,9 +74,9 @@ object ConceptDrift {
     */
     def getInitialElementIfNoNumeric(
         numericColumnNameArray:Array[String], 
-        columnNameAndTypeArray:Array[(String, String)]
+        columnNameAndTypeArray:Array[ColumnDescription]
     ):Array[String]={
-        return if (numericColumnNameArray.length>0) numericColumnNameArray else Array(columnNameAndTypeArray(0)._1)
+        return if (numericColumnNameArray.length>0) numericColumnNameArray else Array(columnNameAndTypeArray(0).name)
     }
     /**
     * Helper function
@@ -80,11 +85,11 @@ object ConceptDrift {
     * all columns in the dataset.
     */
     def getNamesOfNumericColumns(
-        columnNameAndTypeArray:Array[(String, String)]
+        columnNameAndTypeArray:Array[ColumnDescription]
     ):Array[String]={
         return columnNameAndTypeArray
-            .filter({case (name, value)=>value==ColumnType.Numeric.toString})
-            .map({case (name, value)=>name})
+            .filter(v=>v.columnType==ColumnType.Numeric.toString)
+            .map(v=>v.name)
     }
     /**
     * Helper function
@@ -188,9 +193,9 @@ object ConceptDrift {
     */
     def getColumnNameAndTypeArray(
         trainingDistributions:FieldsBins
-    ):Array[(String, String)]={
+    ):Array[ColumnDescription]={
         trainingDistributions.fields.map({case (key, value)=>{
-            (key, value.columnType)
+            ColumnDescription(key, value.columnType)
         }}).toArray
     }
 
@@ -213,34 +218,34 @@ object ConceptDrift {
         getNumericDistribution: (DataFrame, String, Array[Double], Long)=>Array[Double],
         getCategoricalDistribution: (DataFrame, String, Long)=>Map[String, Double],
         numBins: Int
-    ):(DataFrame, Array[(String, String)])=>FieldsBins={
-        (sparkDataFrame: DataFrame, columnNameAndTypeArray:Array[(String, String)])=>{
+    ):(DataFrame, Array[ColumnDescription])=>FieldsBins={
+        (sparkDataFrame: DataFrame, columnNameAndTypeArray:Array[ColumnDescription])=>{
             val numericColumnArray=getNamesOfNumericColumns(columnNameAndTypeArray)
             val minMaxArray=getInitialElementIfNoNumeric(numericColumnArray, columnNameAndTypeArray)
             val minAndMax=computeMinMax(sparkDataFrame, minMaxArray)
             val n=minAndMax(s"count(${minMaxArray(0)})").asInstanceOf[Long] 
             val numericalBins=if (numBins==0) math.max(math.floor(math.sqrt(n)), NUM_BINS).toInt else numBins
-            val fields=columnNameAndTypeArray.map({case (name, columnType)=>(
-                name,
+            val fields=columnNameAndTypeArray.map(v=>(
+                v.name,
                 DistributionHolder(
-                    if (columnType==ColumnType.Numeric.toString) Left(
+                    if (v.columnType==ColumnType.Numeric.toString) Left(
                         getNumericDistribution(
-                            sparkDataFrame, name, 
+                            sparkDataFrame, v.name, 
                             computeBreaks(
-                                minAndMax(s"min(${name})").asInstanceOf[Double], 
-                                minAndMax(s"max(${name})").asInstanceOf[Double], 
+                                minAndMax(s"min(${v.name})").asInstanceOf[Double], 
+                                minAndMax(s"max(${v.name})").asInstanceOf[Double], 
                                 numericalBins
                             ), n
                         )
                     )
                     else Right(
                         getCategoricalDistribution(
-                            sparkDataFrame, name, n
+                            sparkDataFrame, v.name, n
                         )
                     ),
-                    columnType
+                    v.columnType
                 )
-            )}).toMap
+            )).toMap
             FieldsBins(fields, numericalBins)
         }
     }

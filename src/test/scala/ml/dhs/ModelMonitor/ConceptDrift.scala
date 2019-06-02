@@ -101,20 +101,20 @@ class GetColumnNameAndTypeArrayTest extends FunSuite {
             3
         )
         val result=ConceptDrift.getColumnNameAndTypeArray(distribution)
-        assert(result(0)._1=="actioncode")
-        assert(result(0)._2==ColumnType.Categorical.toString)
-        assert(result(1)._1=="origin")
-        assert(result(1)._2==ColumnType.Categorical.toString)
-        assert(result(2)._1=="exampleNumeric")
-        assert(result(2)._2==ColumnType.Numeric.toString)
+        assert(result(0).name=="actioncode")
+        assert(result(0).columnType==ColumnType.Categorical.toString)
+        assert(result(1).name=="origin")
+        assert(result(1).columnType==ColumnType.Categorical.toString)
+        assert(result(2).name=="exampleNumeric")
+        assert(result(2).columnType==ColumnType.Numeric.toString)
     }
 }
 
 class InitialElementIfNoNumericTest extends FunSuite {
     test("it gets name of first category"){
         val columnNameAnyTypeArray=Array(
-            ("hello", ColumnType.Categorical.toString),
-            ("world", ColumnType.Categorical.toString)
+            ColumnDescription("hello", ColumnType.Categorical.toString),
+            ColumnDescription("world", ColumnType.Categorical.toString)
         )
         val numericArray:Array[String]=Array()
         val result=ConceptDrift.getInitialElementIfNoNumeric(numericArray, columnNameAnyTypeArray)
@@ -126,8 +126,8 @@ class InitialElementIfNoNumericTest extends FunSuite {
     }
     test("it returns numeric array if it exists"){
         val columnNameAnyTypeArray=Array(
-            ("hello", ColumnType.Categorical.toString),
-            ("world", ColumnType.Categorical.toString)
+            ColumnDescription("hello", ColumnType.Categorical.toString),
+            ColumnDescription("world", ColumnType.Categorical.toString)
         )
         val numericArray:Array[String]=Array("goodbye", "cruel world")
         val result=ConceptDrift.getInitialElementIfNoNumeric(numericArray, columnNameAnyTypeArray)
@@ -142,9 +142,9 @@ class GetNumericColumnsTest extends FunSuite {
     test("it gets only numeric columns"){
         val expected=Array("hello", "world")
         val columnNameAnyTypeArray=Array(
-            ("goodbye", ColumnType.Categorical.toString),
-            ("hello", ColumnType.Numeric.toString),
-            ("world", ColumnType.Numeric.toString)
+            ColumnDescription("goodbye", ColumnType.Categorical.toString),
+            ColumnDescription("hello", ColumnType.Numeric.toString),
+            ColumnDescription("world", ColumnType.Numeric.toString)
         ) 
         val result=ConceptDrift.getNamesOfNumericColumns(columnNameAnyTypeArray)
         for ((e, r) <- expected.zip(result)){
@@ -235,9 +235,9 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         import sqlCtx.implicits._
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ("actioncode", ColumnType.Categorical.toString),
-            ("origin", ColumnType.Categorical.toString),
-            ("exampleNumeric", ColumnType.Numeric.toString)
+            ColumnDescription("actioncode", ColumnType.Categorical.toString),
+            ColumnDescription("origin", ColumnType.Categorical.toString),
+            ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val results=ConceptDrift.getDistributions(
             trainDataset, columnNameAnyTypeArray
@@ -281,7 +281,7 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         import sqlCtx.implicits._
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ("exampleNumeric", ColumnType.Numeric.toString)
+            ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val results=ConceptDrift.getDistributions(
             trainDataset, columnNameAnyTypeArray
@@ -310,8 +310,8 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         import sqlCtx.implicits._
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ("actioncode", ColumnType.Categorical.toString),
-            ("origin", ColumnType.Categorical.toString)
+            ColumnDescription("actioncode", ColumnType.Categorical.toString),
+            ColumnDescription("origin", ColumnType.Categorical.toString)
         )
         val results=ConceptDrift.getDistributions(
             trainDataset, columnNameAnyTypeArray
@@ -388,9 +388,9 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
         import sqlCtx.implicits._
         val testDataset=CreateDataTests.create_test_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ("actioncode", ColumnType.Categorical.toString),
-            ("origin", ColumnType.Categorical.toString),
-            ("exampleNumeric", ColumnType.Numeric.toString)
+            ColumnDescription("actioncode", ColumnType.Categorical.toString),
+            ColumnDescription("origin", ColumnType.Categorical.toString),
+            ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val distribution=ConceptDrift.getDistributions(testDataset, columnNameAnyTypeArray)
         val result=ConceptDrift.getNewDistributionsAndCompare(testDataset, distribution)
@@ -404,9 +404,9 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
         val testDataset=CreateDataTests.create_test_dataset(sc, sqlCtx)
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ("actioncode", ColumnType.Categorical.toString),
-            ("origin", ColumnType.Categorical.toString),
-            ("exampleNumeric", ColumnType.Numeric.toString)
+            ColumnDescription("actioncode", ColumnType.Categorical.toString),
+            ColumnDescription("origin", ColumnType.Categorical.toString),
+            ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val distribution=ConceptDrift.getDistributions(trainDataset, columnNameAnyTypeArray)
         val isSaved=ConceptDrift.saveDistribution(distribution, "test.json")

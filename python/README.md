@@ -2,4 +2,4 @@
 
 To run tests (assuming already installed dependencies):
 
-`PYSPARK_PYTHON=python3 PYTEST_ADDOPTS="--ignore=lib64" spark-submit setup.py test`
+`PYSPARK_PYTHON=python3 spark-submit --packages ml.dhs:modelmonitor_2.11:0.0.1 setup.py test`

@@ -30,13 +30,13 @@ object CreateResultsTests {
         import sqlCtx.implicits._
         val ssx=new StateSpaceXploration(42)
         val columns=Array(
-            Column("v1", "Categorical", Right(Array(
+            ColumnSummary("v1", "Categorical", Right(Array(
                 "a", "b", "c"
             ))),
-            Column("v2", "Numeric", Left(Array(-5.0, 5.0))),
-            Column("v3", "Numeric", Left(Array(-5.0, 5.0))),
-            Column("v4", "Numeric", Left(Array(-5.0, 5.0))),
-            Column("v5", "Categorical", Right(Array(
+            ColumnSummary("v2", "Numeric", Left(Array(-5.0, 5.0))),
+            ColumnSummary("v3", "Numeric", Left(Array(-5.0, 5.0))),
+            ColumnSummary("v4", "Numeric", Left(Array(-5.0, 5.0))),
+            ColumnSummary("v5", "Categorical", Right(Array(
                 "f", "g", "h", "i"
             )))
         )
@@ -85,16 +85,16 @@ class SimulateCategoricalColumnTest extends FunSuite {
 
 class GenerateDataSetTest extends FunSuite with DataFrameSuiteBase {
     val columns=Array(
-        Column("actioncode", "Categorical", Right(Array(
+        ColumnSummary("actioncode", "Categorical", Right(Array(
             "Closed with non-monetary relief",
             "Closed with monetary relief",
             "Closed with explanation" 
         ))),
-        Column("origin", "Categorical", Right(Array(
+        ColumnSummary("origin", "Categorical", Right(Array(
             "Branch",
             "Customer Meeting" 
         ))),
-        Column("numericExample", "Numeric", Left(Array(
+        ColumnSummary("numericExample", "Numeric", Left(Array(
             -3.0, 6.0 
         )))
     )
@@ -150,13 +150,13 @@ class GetPredictionsTest extends FunSuite with DataFrameSuiteBase {
         val p=new Pipeline().setStages(Array(encodeV1, encodeV5, assembleV, model)).fit(dataset)
         val ssx=new StateSpaceXploration(42)
         val columns=Array(
-            Column("v1", "Categorical", Right(Array(
+            ColumnSummary("v1", "Categorical", Right(Array(
                 "a", "b", "c"
             ))),
-            Column("v2", "Numeric", Left(Array(-5.0, 5.0))),
-            Column("v3", "Numeric", Left(Array(-5.0, 5.0))),
-            Column("v4", "Numeric", Left(Array(-5.0, 5.0))),
-            Column("v5", "Categorical", Right(Array(
+            ColumnSummary("v2", "Numeric", Left(Array(-5.0, 5.0))),
+            ColumnSummary("v3", "Numeric", Left(Array(-5.0, 5.0))),
+            ColumnSummary("v4", "Numeric", Left(Array(-5.0, 5.0))),
+            ColumnSummary("v5", "Categorical", Right(Array(
                 "f", "g", "h", "i"
             )))
         )

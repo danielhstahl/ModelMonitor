@@ -7,7 +7,7 @@ import org.apache.spark.sql.functions
 import scala.util.Random
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.PipelineModel
-case class Column(
+case class ColumnSummary(
     name: String,
     columnType: String,
     values: Either[Array[Double], Array[String]]
@@ -24,13 +24,13 @@ class StateSpaceXploration(val seed: Int) {
     def simulateCategoricalColumn(factors: Array[String]):String={
         factors(r.nextInt(factors.length))
     }
-    def convertColumnsToRow(columns:Array[Column]):Row={
+    def convertColumnsToRow(columns:Array[ColumnSummary]):Row={
         Row(columns.map(v=> v.values match {
             case Left(cval)=>simulateNumericalColumn(cval(0), cval(1))
             case Right(cval)=>simulateCategoricalColumn(cval)
         }):_*)
     }
-    def generateDataSet(sc:SparkContext, sqlCtx:SQLContext, numSims:Int, columns:Array[Column]):DataFrame={
+    def generateDataSet(sc:SparkContext, sqlCtx:SQLContext, numSims:Int, columns:Array[ColumnSummary]):DataFrame={
         val rows=(1 to numSims).map(v=>convertColumnsToRow(columns))
         val rdd=sc.makeRDD[Row](rows)
         val schema=StructType(

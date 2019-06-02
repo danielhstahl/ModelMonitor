@@ -8,3 +8,5 @@ pip-selfcheck.json
 pyvenv.cfg
 *.egg-info
 __pycache__
+*.log
+metastore_db
