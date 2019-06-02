@@ -1,2 +1,8 @@
 target
 project/target
+*bin
+*lib
+*lib64
+pip-selfcheck.json
+*share
+pyvenv.cfg

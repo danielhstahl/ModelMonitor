@@ -25,7 +25,7 @@ val columnNameAnyTypeArray=Array(
     ("columnName3", ColumnType.Numeric.toString)
 )
 // trainDataset is a spark dataframe containing the inputs to the model
-val distribution=ConceptDrift.getDistributions(
+val distribution=ConceptDrift.getDistributionss(
     trainDataset, columnNameAnyTypeArray
 )
 //saved for later monitoring
