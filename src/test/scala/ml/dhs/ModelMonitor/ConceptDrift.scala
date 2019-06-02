@@ -1,4 +1,4 @@
-package ml.dhs.ModelMonitor
+package ml.dhs.modelmonitor
 
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.{SparkContext}

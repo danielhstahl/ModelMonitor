@@ -6,3 +6,5 @@ project/target
 pip-selfcheck.json
 *share
 pyvenv.cfg
+*.egg-info
+__pycache__

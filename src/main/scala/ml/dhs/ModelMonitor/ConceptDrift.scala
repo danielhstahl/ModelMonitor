@@ -1,4 +1,4 @@
-package ml.dhs.ModelMonitor
+package ml.dhs.modelmonitor
 import scala.math
 import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.sql.functions

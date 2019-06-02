@@ -13,12 +13,12 @@ This library contains two monitoring capabilities: Concept Drift monitoring, and
 
 ## Install
 
-Clone this repository, and use `sbt test` to run the tests.
+Clone this repository, and use `sbt test` to run the tests.  To publish locally, run `sbt publishLocal`.  To add to a pyspark session, run `pyspark --packages ml.dhs:modelmonitor_2.11:0.0.1`
 
 ## Concept Drift monitoring
 
 ```scala
-import ModelMonitoring.{ConceptDrift, ColumnType}
+import modelmonitor.{ConceptDrift, ColumnType}
 val columnNameAnyTypeArray=Array(
     ("columnName1", ColumnType.Categorical.toString),
     ("columnName2", ColumnType.Categorical.toString),
@@ -41,7 +41,7 @@ An example of the saved distribution is in [the test.json](./docs/test.json) fil
 ## State Space Exploration
 
 ```scala
-import ModelMonitoring.{StateSpaceXploration, ColumnType}
+import modelmonitor.{StateSpaceXploration, ColumnType}
 val columns=Array(
     Column("v1", ColumnType.Categorical.toString, Right(Array(
         "a", "b", "c"

@@ -1,4 +1,4 @@
-package ml.dhs.ModelMonitor
+package ml.dhs.modelmonitor
 import org.apache.spark.sql.{SparkSession, DataFrame, Row, SQLContext}
 import org.apache.spark.sql.types.{StructType, ArrayType, DoubleType, StringType, StructField}
 import org.apache.spark.ml.feature.{PCA, QuantileDiscretizer}

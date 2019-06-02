@@ -2,7 +2,7 @@
 
 scalaVersion := "2.11.12"
 
-name := "ModelMonitoring"
+name := "modelmonitor"
 organization := "ml.dhs"
 version := "0.0.1"
 

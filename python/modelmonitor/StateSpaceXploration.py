@@ -7,7 +7,7 @@ from typing import List, Tuple
 class StateSpaceXploration(object):
     def __init__(self, seed):
         super(StateSpaceXploration, self).__init__()
-        self._java_obj = _jvm().ml.dhs.ModelMonitoring.StateSpaceXploration(seed)
+        self._java_obj = _jvm().ml.dhs.modelmonitor.StateSpaceXploration(seed)
 
     def generateDataSet(self, sc, numSims, columns):
         sqlContext = SQLContext(sc)

@@ -3,7 +3,7 @@ from pyspark.ml.base import Transformer
 from pyspark.ml.util import _jvm
 from typing import List, Tuple
 
-def getDistributions(self, dataset, columnNameAndTypeArray:List[Tuple[str, str]]):
+def getDistributions(dataset, columnNameAndTypeArray:List[Tuple[str, str]]):
     cdr = SimpleConceptDrift()
     cdr.getDistributions(dataset, columnNameAndTypeArray)
 
@@ -25,7 +25,7 @@ def getNewDistributionsAndCompare(newDataSet, savedResult):
 class SimpleConceptDrift(object):
     def __init__(self):
         super(SimpleConceptDrift, self).__init__()
-        self._java_obj = _jvm().ml.dhs.ModelMonitoring.ConceptDrift
+        self._java_obj = _jvm().ml.dhs.modelmonitor.ConceptDrift
 
     def getDistributions(self, dataset, columnNameAndTypeArray):
         self._java_obj.getDistributions(dataset._jdf, columnNameAndTypeArray)

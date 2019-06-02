@@ -8,7 +8,7 @@ if os.path.isfile(requirementPath):
         install_requires=f.read().splitlines()
 
 setup(
-    name="ModelMonitoring",
+    name="modelmonitor",
     version="0.0.1",
     packages=find_packages(),
     install_requires=install_requires,
