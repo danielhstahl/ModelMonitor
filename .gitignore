@@ -10,3 +10,5 @@ pyvenv.cfg
 __pycache__
 *.log
 metastore_db
+test.json
+test_py.json

@@ -36,7 +36,7 @@ val resultSaved=ConceptDrift.loadDistribution("test.json")
 val result=ConceptDrift.getNewDistributionsAndCompare(testDataset, resultSaved)
 ```
 
-An example of the saved distribution is in [the test.json](./docs/test.json) file.
+An example of the saved distribution is in [the example json](./docs/example.json) file.
 
 ## State Space Exploration
 

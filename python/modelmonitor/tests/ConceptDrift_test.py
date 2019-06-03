@@ -65,6 +65,8 @@ class TestEndToEndIntegration:
             ('examplenumeric', 'Numeric'),
         ]
         cdf.saveDistribution(self.train_dataset, columnNameAndTypeArray, "./test_py.json")
-        results=cdf.getNewDistributionsAndCompare(self.test_dataset, "./test_py.json")
-        print(results)
+        results=cdf.getNewDistributionsAndCompare(self.test_dataset, columnNameAndTypeArray, "./test_py.json")
+        assert results['examplenumeric']>0
+        assert results['actioncode']>0
+        assert results['origin']>0
         
