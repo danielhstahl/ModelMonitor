@@ -46,7 +46,6 @@ class StateSpaceXploration(val seed: Int) {
     }
     def getPredictionsHelper(
         modelResults:DataFrame,
-        //sqlCtx:SQLContext,
         featuresCol:String,
         predictionCol:String
     ):DataFrame={
@@ -55,7 +54,6 @@ class StateSpaceXploration(val seed: Int) {
             .setInputCol(featuresCol)
             .setOutputCol("pcaFeatures")
         val pcaModel=pca.fit(modelResults)
-        //return modelResults
         val pcaData=pcaModel.transform(modelResults)
             .select("pcaFeatures", predictionCol)
 
@@ -69,9 +67,7 @@ class StateSpaceXploration(val seed: Int) {
             pcaWithColumns_1(predictionCol)
         var pcaWithColumns=pcaWithColumns_1.select(exprs:_*)
         
-        //return pcaWithColumns
         for (col <- INPUT_COLUMN_NAMES){
-            //pcaWithColumns=pcaWithColumns.withColumnRenamed(s"_tmp${i}", col)
             val buckets=new QuantileDiscretizer()
                 .setNumBuckets(NUM_BUCKETS)
                 .setInputCol(col)

@@ -294,7 +294,6 @@ object ConceptDrift {
     * @param file Name of the file to read from.
     */
     def loadDistribution(file:String):FieldsBins={
-        //implicit val json4sFormats: Formats = DefaultFormats.withLong
         implicit val json4sFormats = DefaultFormats
         val bufSrc=Source.fromFile(file)
         val fileContents =bufSrc.getLines.mkString
