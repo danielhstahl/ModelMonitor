@@ -41,19 +41,16 @@ object CreateResultsTests {
             )))
         )
         val numSims=500
-        val explanatory=ssx.generateDataSet(sc, sqlCtx, numSims, columns)
+        val explanatory=ssx.generateDataSet(sc, /*sqlCtx,*/ numSims, columns)
         val r=new Random(42)
         val convertToLabel=(v1:String, v2:Double, v3:Double, v4:Double, v5:String)=>{
             val doubleV1=if(v1=="a"){0.0} else if(v1=="b"){0.25} else {0.5}
             val doubleV5=if(v5=="f"){0.0} else if(v5=="g"){0.2} else if(v5=="h") {0.3} else {0.6}
             val threshold=doubleV1+((15.0+v2+v3+v4)/50.0)+doubleV5
             if (r.nextDouble>threshold) {1.0} else {0.0}
-            //return threshold
         }
             
         val udfConvertToLabel = functions.udf(convertToLabel)
-        //val rows=(1 to numSims).map(v=>Row(if (r.nextDouble>0.5) { 1.0} else {0.0}))
-        //val rdd=sc.makeRDD[Row](rows)
         explanatory.withColumn("label", udfConvertToLabel($"v1", $"v2", $"v3", $"v4", $"v5"))
     }
 }
@@ -100,14 +97,12 @@ class GenerateDataSetTest extends FunSuite with DataFrameSuiteBase {
     )
     test("creates data frame with correct number of rows"){
         val ssx=new StateSpaceXploration(42)
-        val sqlCtx = sqlContext
-        val results=ssx.generateDataSet(sc, sqlCtx, 30, columns)
+        val results=ssx.generateDataSet(sc, 30, columns)
         assert(results.collect().toArray.length===30)
     }
     test("creates data frame with correct columns"){
         val ssx=new StateSpaceXploration(42)
-        val sqlCtx = sqlContext
-        val results=ssx.generateDataSet(sc, sqlCtx, 30, columns)
+        val results=ssx.generateDataSet(sc,  30, columns)
         val expected=Array("actioncode", "origin", "numericExample")
         for ((e, r) <- expected.zip(results.columns)){
             assert(e === r)
@@ -160,13 +155,13 @@ class GetPredictionsTest extends FunSuite with DataFrameSuiteBase {
                 "f", "g", "h", "i"
             )))
         )
-        val simulatedDataSet=ssx.generateDataSet(sc, sqlCtx, 100000, columns)
+        val simulatedDataSet=ssx.generateDataSet(sc, 100000, columns)
         val result=ssx.getPredictions(
             simulatedDataSet,
             p
         ).collect()
         assert(result.length<=100) //10x10, but duplicates may prevent exact match
-        //result.foreach(v=>println(v))
+
     }
     
    

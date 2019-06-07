@@ -30,7 +30,7 @@ class StateSpaceXploration(val seed: Int) {
             case Right(cval)=>simulateCategoricalColumn(cval)
         }):_*)
     }
-    def generateDataSet(sc:SparkContext, sqlCtx:SQLContext, numSims:Int, columns:Array[ColumnSummary]):DataFrame={
+    def generateDataSet(sc:SparkContext, numSims:Int, columns:Array[ColumnSummary]):DataFrame={
         val rows=(1 to numSims).map(v=>convertColumnsToRow(columns))
         val rdd=sc.makeRDD[Row](rows)
         val schema=StructType(
@@ -39,7 +39,8 @@ class StateSpaceXploration(val seed: Int) {
                 StructField(v.name, colType, false)
             })
         )
-        sqlCtx.createDataFrame(rdd, schema)
+        val sqlContext = new SQLContext(sc)
+        sqlContext.createDataFrame(rdd, schema)
     }
     def getPredictionsHelper(modelResults:DataFrame):DataFrame={
         getPredictionsHelper(modelResults,  "features", "prediction")
