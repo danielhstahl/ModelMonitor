@@ -6,16 +6,13 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B
 RUN apt-get update
 RUN apt-get install -y sbt
 RUN apt-get install -y python3-pip
-#RUN useradd -ms /bin/bash developer
 ENV HOME /home/developer
 WORKDIR /home/developer
 COPY . .
 ARG VERSION
-#USER developer
 RUN sbt clean coverage test coverageReport
 RUN sbt publishLocal
 RUN chmod -R 775 /home/developer
-#RUN chown -R developer:root /home/developer 
 WORKDIR /home/developer/python
 RUN pip3 install -r requirements.txt
-#RUN PYSPARK_PYTHON=python3 spark-submit --packages ml.dhs:modelmonitor_2.11:$VERSION-SNAPSHOT setup.py test
+RUN PYSPARK_PYTHON=python3 spark-submit --packages ml.dhs:modelmonitor_2.11:$VERSION-SNAPSHOT setup.py test
