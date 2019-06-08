@@ -11,17 +11,17 @@ def teardown_module():
 def create_test_dataset(spark):
     sqlCtx=SQLContext(spark.sparkContext)
     dataset=pd.DataFrame(data={
-        'actioncode':[
-            'Closed with non-monetary relief',
-            'Closed with monetary relief',
-            'Closed with explanation',
-            'Closed with monetary relief',
-            'Closed with monetary relief',
-            'Closed with non-monetary relief'
+        'v1':[
+            'text1',
+            'text2',
+            'text3',
+            'text2',
+            'text2',
+            'text1'
         ],
-        'origin':[
-            'Branch', 'Customer Meeting', 'Branch',
-            'Branch', 'Customer Meeting', 'Branch'
+        'v2':[
+            'val1', 'val2', 'val1',
+            'val1', 'val2', 'val1'
         ],
         'examplenumeric':[2.0, 2.4, 1.4, -1.2, 1.2, 5.4]
     })
@@ -30,24 +30,24 @@ def create_test_dataset(spark):
 def create_train_dataset(spark):
     sqlCtx=SQLContext(spark.sparkContext)
     dataset=pd.DataFrame(data={
-        'actioncode':[
-            'Closed with non-monetary relief',
-            'Closed with monetary relief',
-            'Closed with explanation',
-            'Closed with monetary relief',
-            'Closed with non-monetary relief',
-            'Closed with non-monetary relief',
-            'Closed with monetary relief',
-            'Closed with explanation',
-            'Closed with monetary relief',
-            'Closed with monetary relief',
-            'Closed with non-monetary relief'
+        'v1':[
+            'text1',
+            'text2',
+            'text3',
+            'text2',
+            'text1',
+            'text1',
+            'text2',
+            'text3',
+            'text2',
+            'text2',
+            'text1'
         ],
-        'origin':[
-            'Branch', 'Customer Meeting', 'Branch',
-            'Branch', 'Customer Meeting',
-            'Branch', 'Customer Meeting', 'Branch',
-            'Branch', 'Customer Meeting', 'Branch',
+        'v2':[
+            'val1', 'val2', 'val1',
+            'val1', 'val2',
+            'val1', 'val2', 'val1',
+            'val1', 'val2', 'val1',
         ],
         'examplenumeric':[2.0, 2.4, 1.4, -1.2, 1.2, 5.4, 2.4, 1.4, -1.2, 1.2, 5.4]
     })
@@ -60,13 +60,13 @@ class TestEndToEndIntegration:
         self.train_dataset=create_train_dataset(spark)
     def test_end_to_end_integration(self):
         columnNameAndTypeArray=[
-            ('actioncode', 'Categorical'),
-            ('origin', 'Categorical'),
+            ('v1', 'Categorical'),
+            ('v2', 'Categorical'),
             ('examplenumeric', 'Numeric'),
         ]
         cdf.saveDistribution(self.train_dataset, columnNameAndTypeArray, "./test_py.json")
         results=cdf.getNewDistributionsAndCompare(self.test_dataset, columnNameAndTypeArray, "./test_py.json")
         assert results['examplenumeric']>0
-        assert results['actioncode']>0
-        assert results['origin']>0
+        assert results['v1']>0
+        assert results['v2']>0
         
