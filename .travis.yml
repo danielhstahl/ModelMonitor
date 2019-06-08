@@ -1,13 +1,21 @@
-language: scala
-
-scala:
-  - 2.11.12
-
-script:
-  - sbt clean coverage test coverageReport
-  - rm -rf ./target/scala-2.11/coverage-report
-  - rm -rf ./target/scala-2.11/scoverage-data
-  - rm -rf ./target/scala-2.11/resolution-cache
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+matrix:
+  include:
+    - language: scala
+      scala:
+        - 2.11.12
+      script:
+        - sbt clean coverage test coverageReport
+        - rm -rf ./target/scala-2.11/coverage-report
+        - rm -rf ./target/scala-2.11/scoverage-data
+        - rm -rf ./target/scala-2.11/resolution-cache
+        - sbt publishLocal
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+    - language: python
+      python: 3.7
+      before_script:
+        - cd python
+        - source bin/activate
+        - pip3 install -r ./requirements.txt
+      script:
+        - PYSPARK_PYTHON=python3 spark-submit --packages ml.dhs:modelmonitor_2.11:0.0.1-SNAPSHOT setup.py test
