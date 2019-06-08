@@ -10,7 +10,7 @@ pluggy==0.12.0
 py==1.8.0
 py4j==0.10.6
 pyparsing==2.4.0
-pyspark==2.3.0
+pyspark==2.3.2
 pytest==4.6.0
 pytest-runner==5.1
 python-dateutil==2.8.0
