@@ -1,2 +1,15 @@
 target
 project/target
+*bin
+*lib
+*lib64
+pip-selfcheck.json
+*share
+pyvenv.cfg
+*.egg-info
+__pycache__
+*.log
+metastore_db
+test.json
+test_py.json
+.vscode

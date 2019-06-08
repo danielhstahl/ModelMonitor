@@ -1,13 +1,9 @@
-language: scala
-
-scala:
-  - 2.11.12
-
+sudo: required
+services:
+  - docker
 script:
-  - sbt clean coverage test coverageReport
-  - rm -rf ./target/scala-2.11/coverage-report
-  - rm -rf ./target/scala-2.11/scoverage-data
-  - rm -rf ./target/scala-2.11/resolution-cache
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - sudo docker build . -t scalatest -f ./docker/Dockerfile --build-arg VERSION=$(<./VERSION)
+  - sudo docker create -ti --name dummy scalatest bash
+  - sudo docker cp dummy:/home/developer/target/scala-2.11/coverage-report/cobertura.xml ./
+  - sudo docker rm -fv dummy
+  - bash <(curl -s https://codecov.io/bash) -f cobertura.xml

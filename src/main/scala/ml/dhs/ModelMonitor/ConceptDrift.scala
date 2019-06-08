@@ -1,4 +1,4 @@
-package ml.dhs.ModelMonitor
+package ml.dhs.modelmonitor
 import scala.math
 import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.sql.functions
@@ -21,6 +21,11 @@ case class FieldsBins(
     numNumericalBins: Int
 )
 
+case class ColumnDescription(
+    name:String,
+    columnType:String
+)
+
 /**
   * A class to help perform identify and track concept drift.
   *
@@ -41,10 +46,14 @@ object ConceptDrift {
     */
     def computeBreaks(min: Double, max: Double, numBins: Int):Array[Double]={
         val binWidth:Double=(max-min)/numBins
-        val breaks=Array.tabulate(numBins+1)(i => min+binWidth*i)
-        breaks(0)=Double.NegativeInfinity
-        breaks(numBins)=Double.PositiveInfinity
-        return breaks
+        return Array.tabulate(numBins+1)(i => if(i==0){
+                Double.NegativeInfinity
+            } else if (i==numBins){
+                Double.PositiveInfinity
+            } else {
+                min+binWidth*i
+            }
+        )
     }
     /**
     * Helper function
@@ -69,9 +78,9 @@ object ConceptDrift {
     */
     def getInitialElementIfNoNumeric(
         numericColumnNameArray:Array[String], 
-        columnNameAndTypeArray:Array[(String, String)]
+        columnNameAndTypeArray:Array[ColumnDescription]
     ):Array[String]={
-        return if (numericColumnNameArray.length>0) numericColumnNameArray else Array(columnNameAndTypeArray(0)._1)
+        return if (numericColumnNameArray.length>0) numericColumnNameArray else Array(columnNameAndTypeArray(0).name)
     }
     /**
     * Helper function
@@ -80,11 +89,11 @@ object ConceptDrift {
     * all columns in the dataset.
     */
     def getNamesOfNumericColumns(
-        columnNameAndTypeArray:Array[(String, String)]
+        columnNameAndTypeArray:Array[ColumnDescription]
     ):Array[String]={
         return columnNameAndTypeArray
-            .filter({case (name, value)=>value==ColumnType.Numeric.toString})
-            .map({case (name, value)=>name})
+            .filter(v=>v.columnType==ColumnType.Numeric.toString)
+            .map(v=>v.name)
     }
     /**
     * Helper function
@@ -188,9 +197,9 @@ object ConceptDrift {
     */
     def getColumnNameAndTypeArray(
         trainingDistributions:FieldsBins
-    ):Array[(String, String)]={
+    ):Array[ColumnDescription]={
         trainingDistributions.fields.map({case (key, value)=>{
-            (key, value.columnType)
+            ColumnDescription(key, value.columnType)
         }}).toArray
     }
 
@@ -213,34 +222,34 @@ object ConceptDrift {
         getNumericDistribution: (DataFrame, String, Array[Double], Long)=>Array[Double],
         getCategoricalDistribution: (DataFrame, String, Long)=>Map[String, Double],
         numBins: Int
-    ):(DataFrame, Array[(String, String)])=>FieldsBins={
-        (sparkDataFrame: DataFrame, columnNameAndTypeArray:Array[(String, String)])=>{
+    ):(DataFrame, Array[ColumnDescription])=>FieldsBins={
+        (sparkDataFrame: DataFrame, columnNameAndTypeArray:Array[ColumnDescription])=>{
             val numericColumnArray=getNamesOfNumericColumns(columnNameAndTypeArray)
             val minMaxArray=getInitialElementIfNoNumeric(numericColumnArray, columnNameAndTypeArray)
             val minAndMax=computeMinMax(sparkDataFrame, minMaxArray)
             val n=minAndMax(s"count(${minMaxArray(0)})").asInstanceOf[Long] 
             val numericalBins=if (numBins==0) math.max(math.floor(math.sqrt(n)), NUM_BINS).toInt else numBins
-            val fields=columnNameAndTypeArray.map({case (name, columnType)=>(
-                name,
+            val fields=columnNameAndTypeArray.map(v=>(
+                v.name,
                 DistributionHolder(
-                    if (columnType==ColumnType.Numeric.toString) Left(
+                    if (v.columnType==ColumnType.Numeric.toString) Left(
                         getNumericDistribution(
-                            sparkDataFrame, name, 
+                            sparkDataFrame, v.name, 
                             computeBreaks(
-                                minAndMax(s"min(${name})").asInstanceOf[Double], 
-                                minAndMax(s"max(${name})").asInstanceOf[Double], 
+                                minAndMax(s"min(${v.name})").asInstanceOf[Double], 
+                                minAndMax(s"max(${v.name})").asInstanceOf[Double], 
                                 numericalBins
                             ), n
                         )
                     )
                     else Right(
                         getCategoricalDistribution(
-                            sparkDataFrame, name, n
+                            sparkDataFrame, v.name, n
                         )
                     ),
-                    columnType
+                    v.columnType
                 )
-            )}).toMap
+            )).toMap
             FieldsBins(fields, numericalBins)
         }
     }
@@ -253,9 +262,14 @@ object ConceptDrift {
     * @param columnNameAndTypeArray Names and types for
     * each variable included in the model.
     */
-    def getDistributions=getDistributionsHelper(
-        computeMinMax, getNumericDistribution, getCategoricalDistribution, 0
-    )
+    def getDistributions(
+        sparkDataFrame:DataFrame, 
+        columnNameAndTypeArray:Array[ColumnDescription]
+    ):FieldsBins={
+        getDistributionsHelper(
+            computeMinMax, getNumericDistribution, getCategoricalDistribution, 0
+        )(sparkDataFrame, columnNameAndTypeArray)
+    }
 
     /**
     * Main function to save the summary at model training
@@ -280,7 +294,7 @@ object ConceptDrift {
     * @param file Name of the file to read from.
     */
     def loadDistribution(file:String):FieldsBins={
-        implicit val json4sFormats: Formats = DefaultFormats.withLong
+        implicit val json4sFormats = DefaultFormats
         val bufSrc=Source.fromFile(file)
         val fileContents =bufSrc.getLines.mkString
         bufSrc.close

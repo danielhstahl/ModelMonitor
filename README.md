@@ -13,19 +13,19 @@ This library contains two monitoring capabilities: Concept Drift monitoring, and
 
 ## Install
 
-Clone this repository, and use `sbt test` to run the tests.
+Clone this repository, and use `sbt test` to run the tests.  To publish locally, run `sbt publishLocal`.  To add to a pyspark session, run `pyspark --packages ml.dhs:modelmonitor_2.11:$VERSION-SNAPSHOT`
 
 ## Concept Drift monitoring
 
 ```scala
-import ModelMonitoring.{ConceptDrift, ColumnType}
+import modelmonitor.{ConceptDrift, ColumnType, ColumnDescription}
 val columnNameAnyTypeArray=Array(
-    ("columnName1", ColumnType.Categorical.toString),
-    ("columnName2", ColumnType.Categorical.toString),
-    ("columnName3", ColumnType.Numeric.toString)
+    ColumnDescription("columnName1", ColumnType.Categorical.toString),
+    ColumnDescription("columnName2", ColumnType.Categorical.toString),
+    ColumnDescription("columnName3", ColumnType.Numeric.toString)
 )
 // trainDataset is a spark dataframe containing the inputs to the model
-val distribution=ConceptDrift.getDistributions(
+val distribution=ConceptDrift.getDistributionss(
     trainDataset, columnNameAnyTypeArray
 )
 //saved for later monitoring
@@ -36,20 +36,20 @@ val resultSaved=ConceptDrift.loadDistribution("test.json")
 val result=ConceptDrift.getNewDistributionsAndCompare(testDataset, resultSaved)
 ```
 
-An example of the saved distribution is in [the test.json](./docs/test.json) file.
+An example of the saved distribution is in [the example json](./docs/example.json) file.
 
 ## State Space Exploration
 
 ```scala
-import ModelMonitoring.{StateSpaceXploration, ColumnType}
+import modelmonitor.{StateSpaceXploration, ColumnType, ColumnSummary}
 val columns=Array(
-    Column("v1", ColumnType.Categorical.toString, Right(Array(
+    ColumnSummary("v1", ColumnType.Categorical.toString, Right(Array(
         "a", "b", "c"
     ))),
-    Column("v2", ColumnType.Numeric.toString, Left(Array(-5.0, 5.0))),
-    Column("v3", ColumnType.Numeric.toString, Left(Array(-5.0, 5.0))),
-    Column("v4", ColumnType.Numeric.toString, Left(Array(-5.0, 5.0))),
-    Column("v5", ColumnType.Categorical.toString, Right(Array(
+    ColumnSummary("v2", ColumnType.Numeric.toString, Left(Array(-5.0, 5.0))),
+    ColumnSummary("v3", ColumnType.Numeric.toString, Left(Array(-5.0, 5.0))),
+    ColumnSummary("v4", ColumnType.Numeric.toString, Left(Array(-5.0, 5.0))),
+    ColumnSummary("v5", ColumnType.Categorical.toString, Right(Array(
         "f", "g", "h", "i"
     )))
 )

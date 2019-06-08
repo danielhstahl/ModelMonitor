@@ -1,10 +1,11 @@
-// The simplest possible sbt build file is just one line:
-
+import scala.io.Source
 scalaVersion := "2.11.12"
 
-name := "ModelMonitoring"
+name := "modelmonitor"
 organization := "ml.dhs"
-version := "0.0.1"
+
+val lines=Source.fromFile("VERSION").getLines.toArray
+version := lines(0)+"-SNAPSHOT"
 
 fork in Test := true
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
@@ -17,6 +18,6 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-mllib" % sparkVersion,
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.12.0" % "test",
-  "org.json4s" %% "json4s-native" % "3.6.6"
+  "org.json4s" %% "json4s-native" % "3.2.11"
 )
 
