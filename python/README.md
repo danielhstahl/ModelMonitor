@@ -41,6 +41,6 @@ assembleV=VectorAssembler(
 model=RandomForestClassifier(labelCol="label", featuresCol="features", numTrees=10)
 p=Pipeline(stages=[encodeV1, encodeV5, assembleV, model]).fit(self.train_dataset)
 ssxi=ssx.StateSpaceXploration(42)
-simDataSet=ssxi.generateDataSet(spark, 10000, columns)
+simDataSet=ssxi.generateDataSet(spark, 100000, columns)
 result=ssxi.getPredictions(spark, simDataSet, p)
 ```
