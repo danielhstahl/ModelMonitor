@@ -1,6 +1,6 @@
 package ml.dhs.modelmonitor
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.sql.{DataFrame, SQLContext, Row}
+import org.apache.spark.sql.{DataFrame, SQLContext, Row, SparkSession}
 import org.apache.spark.{SparkContext}
 import org.apache.spark.ml.linalg.Vectors
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
@@ -41,7 +41,8 @@ object CreateResultsTests {
             )))
         )
         val numSims=500
-        val explanatory=ssx.generateDataSet(sc, /*sqlCtx,*/ numSims, columns)
+        val spark=SparkSession.builder.config(sc.getConf).getOrCreate()
+        val explanatory=ssx.generateDataSet(spark, numSims, columns)
         val r=new Random(42)
         val convertToLabel=(v1:String, v2:Double, v3:Double, v4:Double, v5:String)=>{
             val doubleV1=if(v1=="a"){0.0} else if(v1=="b"){0.25} else {0.5}
@@ -97,12 +98,14 @@ class GenerateDataSetTest extends FunSuite with DataFrameSuiteBase {
     )
     test("creates data frame with correct number of rows"){
         val ssx=new StateSpaceXploration(42)
-        val results=ssx.generateDataSet(sc, 30, columns)
+        val spark=SparkSession.builder.config(sc.getConf).getOrCreate()
+        val results=ssx.generateDataSet(spark, 30, columns)
         assert(results.collect().toArray.length===30)
     }
     test("creates data frame with correct columns"){
         val ssx=new StateSpaceXploration(42)
-        val results=ssx.generateDataSet(sc,  30, columns)
+        val spark=SparkSession.builder.config(sc.getConf).getOrCreate()
+        val results=ssx.generateDataSet(spark,  30, columns)
         val expected=Array("actioncode", "origin", "numericExample")
         for ((e, r) <- expected.zip(results.columns)){
             assert(e === r)
@@ -155,7 +158,8 @@ class GetPredictionsTest extends FunSuite with DataFrameSuiteBase {
                 "f", "g", "h", "i"
             )))
         )
-        val simulatedDataSet=ssx.generateDataSet(sc, 100000, columns)
+        val spark=SparkSession.builder.config(sc.getConf).getOrCreate()
+        val simulatedDataSet=ssx.generateDataSet(spark, 100000, columns)
         val result=ssx.getPredictions(
             simulatedDataSet,
             p

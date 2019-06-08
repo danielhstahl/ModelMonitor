@@ -14,30 +14,30 @@ object CreateDataTests {
         //val sqlContext = new SQLContext(sc)
         import sqlCtx.implicits._
         return sc.parallelize(Seq(
-            ("Closed with non-monetary relief","Branch", 2.0),
-            ("Closed with monetary relief","Customer Meeting", 2.4),
-            ("Closed with explanation","Branch", 1.4),
-            ("Closed with monetary relief","Branch", -1.2),
-            ("Closed with monetary relief","Customer Meeting", 1.2),
-            ("Closed with non-monetary relief","Branch", 5.4)
-        )).toDF("actioncode", "origin", "exampleNumeric")
+            ("text1","val1", 2.0),
+            ("text2","val2", 2.4),
+            ("text3","val1", 1.4),
+            ("text2","val1", -1.2),
+            ("text2","val2", 1.2),
+            ("text1","val1", 5.4)
+        )).toDF("v1", "v2", "exampleNumeric")
     }
     def create_test_dataset(sc:SparkContext, sqlCtx:SQLContext):DataFrame={
         //val sqlContext = new SQLContext(sc)
         import sqlCtx.implicits._
         return sc.parallelize(Seq(
-            ("Closed with non-monetary relief","Branch", 2.0),
-            ("Closed with monetary relief","Customer Meeting", 2.4),
-            ("Closed with explanation","Branch", 1.4),
-            ("Closed with monetary relief","Branch", -1.2),
-            ("Closed with non-monetary relief","Customer Meeting", 1.2),
-            ("Closed with non-monetary relief","Branch", 5.4),
-            ("Closed with monetary relief","Customer Meeting", 2.4),
-            ("Closed with explanation","Branch", 1.4),
-            ("Closed with monetary relief","Branch", -1.2),
-            ("Closed with monetary relief","Customer Meeting", 1.2),
-            ("Closed with non-monetary relief","Branch", 5.4)
-        )).toDF("actioncode", "origin", "exampleNumeric")
+            ("text1","val1", 2.0),
+            ("text2","val2", 2.4),
+            ("text3","val1", 1.4),
+            ("text2","val1", -1.2),
+            ("text1","val2", 1.2),
+            ("text1","val1", 5.4),
+            ("text2","val2", 2.4),
+            ("text3","val1", 1.4),
+            ("text2","val1", -1.2),
+            ("text2","val2", 1.2),
+            ("text1","val1", 5.4)
+        )).toDF("v1", "v2", "exampleNumeric")
     }
 }
 
@@ -74,18 +74,18 @@ class GetColumnNameAndTypeArrayTest extends FunSuite {
     test("it returns name and type"){
         val distribution=FieldsBins(
             Map(
-                "actioncode" -> DistributionHolder(
+                "v1" -> DistributionHolder(
                     Right(Map(
-                        "Closed with non-monetary relief"->0.3333333333333333,
-                        "Closed with monetary relief"->0.5,
-                        "Closed with explanation"->0.16666666666666666
+                        "text1"->0.3333333333333333,
+                        "text2"->0.5,
+                        "text3"->0.16666666666666666
                     )),      
                     ColumnType.Categorical.toString        
                 ),
-                "origin" -> DistributionHolder(
+                "v2" -> DistributionHolder(
                     Right(Map(
-                        "Branch"->0.6666666666666666,
-                        "Customer Meeting"->0.3333333333333333
+                        "val1"->0.6666666666666666,
+                        "val2"->0.3333333333333333
                     )),
                     ColumnType.Categorical.toString
                 ),
@@ -101,9 +101,9 @@ class GetColumnNameAndTypeArrayTest extends FunSuite {
             3
         )
         val result=ConceptDrift.getColumnNameAndTypeArray(distribution)
-        assert(result(0).name=="actioncode")
+        assert(result(0).name=="v1")
         assert(result(0).columnType==ColumnType.Categorical.toString)
-        assert(result(1).name=="origin")
+        assert(result(1).name=="v2")
         assert(result(1).columnType==ColumnType.Categorical.toString)
         assert(result(2).name=="exampleNumeric")
         assert(result(2).columnType==ColumnType.Numeric.toString)
@@ -167,7 +167,7 @@ class ZipperTest extends FunSuite {
             assert(e._3 === r._3)
         }
     }
-    test("it gets all frequency from new list when origin less than new list"){
+    test("it gets all frequency from new list when v2 less than new list"){
         val expected=Array(
             ("hello", 4.0, 3.0), 
             ("goodbye", 5.0, 2.0),
@@ -218,14 +218,14 @@ class GetCategoricalDistributionTest extends FunSuite with DataFrameSuiteBase /*
         import sqlCtx.implicits._
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val result=ConceptDrift.getCategoricalDistribution(
-            trainDataset, "origin", 6
+            trainDataset, "v2", 6
         )
         val expected=Map(
-            "Branch"->0.666666666666666666,
-            "Customer Meeting"->0.333333333333333333
+            "val1"->0.666666666666666666,
+            "val2"->0.333333333333333333
         )
-        assert(result("Branch")===expected("Branch"))
-        assert(result("Customer Meeting")===expected("Customer Meeting"))
+        assert(result("val1")===expected("val1"))
+        assert(result("val2")===expected("val2"))
     }
 }
 
@@ -235,8 +235,8 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         import sqlCtx.implicits._
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ColumnDescription("actioncode", ColumnType.Categorical.toString),
-            ColumnDescription("origin", ColumnType.Categorical.toString),
+            ColumnDescription("v1", ColumnType.Categorical.toString),
+            ColumnDescription("v2", ColumnType.Categorical.toString),
             ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val results=ConceptDrift.getDistributions(
@@ -244,18 +244,18 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         )
         val expected=FieldsBins(
             Map(
-                "actioncode" -> DistributionHolder(
+                "v1" -> DistributionHolder(
                     Right(Map(
-                        "Closed with non-monetary relief"->0.3333333333333333,
-                        "Closed with monetary relief"->0.5,
-                        "Closed with explanation"->0.16666666666666666
+                        "text3"->0.16666666666666666,
+                        "text2"->0.5,
+                        "text1"->0.3333333333333333
                     )),                    
                     ColumnType.Categorical.toString
                 ),
-                "origin" -> DistributionHolder(
+                "v2" -> DistributionHolder(
                     Right(Map(
-                        "Branch"->0.6666666666666666,
-                        "Customer Meeting"->0.3333333333333333
+                        "val1"->0.6666666666666666,
+                        "val2"->0.3333333333333333
                     )),
                     ColumnType.Categorical.toString
                 ),
@@ -310,26 +310,26 @@ class GetDistributionsTest extends FunSuite with DataFrameSuiteBase  {
         import sqlCtx.implicits._
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ColumnDescription("actioncode", ColumnType.Categorical.toString),
-            ColumnDescription("origin", ColumnType.Categorical.toString)
+            ColumnDescription("v1", ColumnType.Categorical.toString),
+            ColumnDescription("v2", ColumnType.Categorical.toString)
         )
         val results=ConceptDrift.getDistributions(
             trainDataset, columnNameAnyTypeArray
         )
         val expected=Map(
             "fields" -> Map(
-                "actioncode" -> Map(
+                "v1" -> Map(
                     "distribution" -> Map(
-                        "Closed with non-monetary relief"->0.3333333333333333,
-                        "Closed with monetary relief"->0.5,
-                        "Closed with explanation"->0.16666666666666666
+                        "text3"->0.16666666666666666,
+                        "text2"->0.5,
+                        "text1"->0.3333333333333333
                     ),                    
                     "columnType" -> ColumnType.Categorical.toString
                 ),
-                "origin" -> Map(
+                "v2" -> Map(
                     "distribution" -> Map(
-                        "Branch"->0.6666666666666666,
-                        "Customer Meeting"->0.3333333333333333
+                        "val1"->0.6666666666666666,
+                        "val2"->0.3333333333333333
                     ),
                     "columnType" -> ColumnType.Categorical.toString
                 )
@@ -351,18 +351,18 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
         import sqlCtx.implicits._
         val testDataset=CreateDataTests.create_test_dataset(sc, sqlCtx)
         val distribution=FieldsBins(Map(
-                "actioncode" -> DistributionHolder(
+                "v1" -> DistributionHolder(
                     Right(Map(
-                        "Closed with non-monetary relief"->0.3333333333333333,
-                        "Closed with monetary relief"->0.5,
-                        "Closed with explanation"->0.16666666666666666
+                        "text1"->0.3333333333333333,
+                        "text2"->0.5,
+                        "text3"->0.16666666666666666
                     )),                    
                     ColumnType.Categorical.toString
                 ),
-                "origin" -> DistributionHolder(
+                "v2" -> DistributionHolder(
                     Right(Map(
-                        "Branch"->0.6666666666666666,
-                        "Customer Meeting"->0.3333333333333333
+                        "val1"->0.6666666666666666,
+                        "val2"->0.3333333333333333
                     )),
                     ColumnType.Categorical.toString
                 ),
@@ -378,8 +378,8 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
             3
         )
         val result=ConceptDrift.getNewDistributionsAndCompare(testDataset, distribution)
-        assert(result("actioncode")>0.0)
-        assert(result("origin")>0.0)
+        assert(result("v1")>0.0)
+        assert(result("v2")>0.0)
         assert(result("exampleNumeric")>0.0)
 
     }
@@ -388,14 +388,14 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
         import sqlCtx.implicits._
         val testDataset=CreateDataTests.create_test_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ColumnDescription("actioncode", ColumnType.Categorical.toString),
-            ColumnDescription("origin", ColumnType.Categorical.toString),
+            ColumnDescription("v1", ColumnType.Categorical.toString),
+            ColumnDescription("v2", ColumnType.Categorical.toString),
             ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val distribution=ConceptDrift.getDistributions(testDataset, columnNameAnyTypeArray)
         val result=ConceptDrift.getNewDistributionsAndCompare(testDataset, distribution)
-        assert(result("actioncode")===0.0)
-        assert(result("origin")===0.0)
+        assert(result("v1")===0.0)
+        assert(result("v2")===0.0)
         assert(result("exampleNumeric")===0.0)
     }
     test("End to end integration"){
@@ -404,16 +404,16 @@ class GetNewDistributionsAndCompareTest extends FunSuite with DataFrameSuiteBase
         val testDataset=CreateDataTests.create_test_dataset(sc, sqlCtx)
         val trainDataset=CreateDataTests.create_train_dataset(sc, sqlCtx)
         val columnNameAnyTypeArray=Array(
-            ColumnDescription("actioncode", ColumnType.Categorical.toString),
-            ColumnDescription("origin", ColumnType.Categorical.toString),
+            ColumnDescription("v1", ColumnType.Categorical.toString),
+            ColumnDescription("v2", ColumnType.Categorical.toString),
             ColumnDescription("exampleNumeric", ColumnType.Numeric.toString)
         )
         val distribution=ConceptDrift.getDistributions(trainDataset, columnNameAnyTypeArray)
         val isSaved=ConceptDrift.saveDistribution(distribution, "test.json")
         val resultSaved=ConceptDrift.loadDistribution("test.json")
         val result=ConceptDrift.getNewDistributionsAndCompare(testDataset, resultSaved)
-        assert(result("actioncode")>0.0)
-        assert(result("origin")>0.0)
+        assert(result("v1")>0.0)
+        assert(result("v2")>0.0)
         assert(result("exampleNumeric")>0.0)
 
     }

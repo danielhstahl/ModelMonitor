@@ -4,7 +4,7 @@ scalaVersion := "2.11.12"
 
 name := "modelmonitor"
 organization := "ml.dhs"
-version := "0.0.1"
+version := "0.0.1-SNAPSHOT"
 
 fork in Test := true
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")

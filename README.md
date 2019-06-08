@@ -13,7 +13,7 @@ This library contains two monitoring capabilities: Concept Drift monitoring, and
 
 ## Install
 
-Clone this repository, and use `sbt test` to run the tests.  To publish locally, run `sbt publishLocal`.  To add to a pyspark session, run `pyspark --packages ml.dhs:modelmonitor_2.11:0.0.1`
+Clone this repository, and use `sbt test` to run the tests.  To publish locally, run `sbt publishLocal`.  To add to a pyspark session, run `pyspark --packages ml.dhs:modelmonitor_2.11:$VERSION-SNAPSHOT`
 
 ## Concept Drift monitoring
 

@@ -12,3 +12,4 @@ __pycache__
 metastore_db
 test.json
 test_py.json
+.vscode
