@@ -3,7 +3,7 @@ import org.apache.spark.ml.Pipeline
 import org.apache.spark.sql.{DataFrame, SQLContext, Row, SparkSession}
 import org.apache.spark.{SparkContext}
 import org.apache.spark.ml.linalg.Vectors
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.{FunSuite}
 import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
 import org.apache.spark.ml.classification.{RandomForestClassifier}
 import org.apache.spark.ml.feature.{VectorAssembler, StringIndexer}

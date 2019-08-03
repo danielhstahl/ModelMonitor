@@ -2,10 +2,10 @@ package ml.dhs.modelmonitor
 
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.{SparkContext}
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.{FunSuite}
 import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
 
-object CreateDataTests {
+object CreateConfusionDataTests {
     def create_dataset(sc:SparkContext, sqlCtx:SQLContext):DataFrame={
         import sqlCtx.implicits._
         return sc.parallelize(Seq(
