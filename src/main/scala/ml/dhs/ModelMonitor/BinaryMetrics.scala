@@ -57,6 +57,7 @@ object BinaryMetrics{
             results("FN"),
             results("FP")
         )
+        
     }
     /**
     * Calculates confusion matrix for a binary classification problem
@@ -111,6 +112,11 @@ object BinaryMetrics{
             modelResults, groupCol,
             "label", "prediction"
         )
+    }
+
+    def _convertToJava(input:Map[String, BinaryConfusionMatrix]):java.util.Map[String, BinaryConfusionMatrix]={
+        import scala.collection.JavaConverters._
+        input.asJava
     }
 
 }

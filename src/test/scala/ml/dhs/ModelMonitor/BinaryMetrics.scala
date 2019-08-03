@@ -38,9 +38,9 @@ class ConfusionMatrixTest extends FunSuite with DataFrameSuiteBase{
     test("it returns confusion matrix correctly") {
         val sqlCtx = sqlContext
         import sqlCtx.implicits._
-        val dataset=CreateDataTests.create_dataset(sc, sqlCtx)
+        val dataset=CreateConfusionDataTests.create_dataset(sc, sqlCtx)
         val expected=BinaryConfusionMatrix(
-            5, 3, 8, 5
+            5, 3, 5, 8
         )
         
         val results=BinaryMetrics.getConfusionMatrix(
@@ -54,18 +54,18 @@ class ConfusionMatrixByGroupTest extends FunSuite with DataFrameSuiteBase{
     test("it returns confusion matrix by group") {
         val sqlCtx = sqlContext
         import sqlCtx.implicits._
-        val dataset=CreateDataTests.create_dataset(sc, sqlCtx)
+        val dataset=CreateConfusionDataTests.create_dataset(sc, sqlCtx)
         val expected=Map(
             "val1"->BinaryConfusionMatrix(
-                4, 1, 3, 2
+                4, 1, 2, 3
             ),
             "val2"->BinaryConfusionMatrix(
-                1, 2, 5, 3
+                1, 2, 3, 5
             )
         )
         
-        val results=BinaryMetrics.getBinaryConfusionMatrix(
-            dataset
+        val results=BinaryMetrics.getConfusionMatrixByGroup(
+            dataset, "group"
         )
         assert(results===expected)
     }
