@@ -2,7 +2,7 @@ package ml.dhs.modelmonitor
 
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.{SparkContext}
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.{FunSuite}
 import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
 
 import org.json4s._
@@ -11,7 +11,6 @@ import org.json4s.jackson.Serialization.{read, write}
 
 object CreateDataTests {
     def create_train_dataset(sc:SparkContext, sqlCtx:SQLContext):DataFrame={
-        //val sqlContext = new SQLContext(sc)
         import sqlCtx.implicits._
         return sc.parallelize(Seq(
             ("text1","val1", 2.0),
@@ -23,7 +22,6 @@ object CreateDataTests {
         )).toDF("v1", "v2", "exampleNumeric")
     }
     def create_test_dataset(sc:SparkContext, sqlCtx:SQLContext):DataFrame={
-        //val sqlContext = new SQLContext(sc)
         import sqlCtx.implicits._
         return sc.parallelize(Seq(
             ("text1","val1", 2.0),
@@ -184,7 +182,7 @@ class ZipperTest extends FunSuite {
     }
 }
 
-class ComputeMinMaxTest extends FunSuite with DataFrameSuiteBase /*with SharedSparkContext*/{
+class ComputeMinMaxTest extends FunSuite with DataFrameSuiteBase {
     test("It returns min and max") {
         val sqlCtx = sqlContext
         import sqlCtx.implicits._
@@ -197,7 +195,7 @@ class ComputeMinMaxTest extends FunSuite with DataFrameSuiteBase /*with SharedSp
     }
 }
 
-class GetNumericDistributionTest extends FunSuite with DataFrameSuiteBase /*with SharedSparkContext*/{
+class GetNumericDistributionTest extends FunSuite with DataFrameSuiteBase{
     test("It gets numeric distribution"){
         val sqlCtx = sqlContext
         import sqlCtx.implicits._
@@ -212,7 +210,7 @@ class GetNumericDistributionTest extends FunSuite with DataFrameSuiteBase /*with
         }
     }
 }
-class GetCategoricalDistributionTest extends FunSuite with DataFrameSuiteBase /*with SharedSparkContext*/{
+class GetCategoricalDistributionTest extends FunSuite with DataFrameSuiteBase {
     test("It gets numeric distribution"){
         val sqlCtx = sqlContext
         import sqlCtx.implicits._

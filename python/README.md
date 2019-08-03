@@ -44,3 +44,26 @@ ssxi=ssx.StateSpaceXploration(42)
 simDataSet=ssxi.generateDataSet(spark, 100000, columns)
 result=ssxi.getPredictions(spark, simDataSet, p)
 ```
+
+
+### Binary Metrics
+
+```python
+from modelmonitor.BinaryMetrics import getConfusionMatrix, getConfusionMatrixByGroup
+results = getConfusionMatrix(dataset)
+assert results["TN"] == 5
+assert results["TP"] == 3
+assert results["FN"] == 5
+assert results["FP"] == 8
+
+results = getConfusionMatrixByGroup(dataset, "group")
+assert results["val1"]["TN"] == 4
+assert results["val1"]["TP"] == 1
+assert results["val1"]["FN"] == 2
+assert results["val1"]["FP"] == 3
+assert results["val2"]["TN"] == 1
+assert results["val2"]["TP"] == 2
+assert results["val2"]["FN"] == 3
+assert results["val2"]["FP"] == 5
+
+```
