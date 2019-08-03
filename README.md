@@ -9,7 +9,7 @@
 
 # Scala code for Model Monitoring in spark
 
-This library contains two monitoring capabilities: Concept Drift monitoring, and State Space Exploration.  Concept drift monitors how the distribution of inputs changes over time.  State Space Exploration simulates from the possible inputs and performs PCA to help plot predictions in three dimensions.  
+This library contains three monitoring capabilities: Concept Drift monitoring, State Space Exploration, and Binary Metrics.  Concept drift monitors how the distribution of inputs changes over time.  State Space Exploration simulates from the possible inputs and performs PCA to help plot predictions in three dimensions.  Binary Metrics provides diagnostic results for either an entire dataframe or for sub-populations of a dataframe.  This can help identify disparate impact on sub-groups of the population.
 
 ## Install
 
@@ -67,3 +67,20 @@ val result=ssx.getPredictions(
 Results from simulated data:
 
 ![Surface Plot](./docs/surface.png)
+
+## Binary Metrics
+
+```scala
+import modelmonitor.BinaryMetrics
+val results=BinaryMetrics.getConfusionMatrix(
+    dataset,
+    "label", //label column, defaults to "label"
+    "prediction" //prediction column, defaults to "prediction"
+)
+val resultsByGroup=BinaryMetrics.getConfusionMatrixByGroup(
+    dataset, 
+    "group", //column to split by
+    "label", //label column, defaults to "label"
+    "prediction" //prediction column, defaults to "prediction"
+)
+```

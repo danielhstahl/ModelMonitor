@@ -90,7 +90,7 @@ def create_dataset(spark):
     return sqlCtx.createDataFrame(dataset)
 
 
-class BinaryMetricsTest:
+class TestBinaryMetrics:
     @classmethod
     def setup_class(self):
         self.dataset = create_dataset(spark)
