@@ -3,7 +3,7 @@ attrs==19.1.0
 hypothesis==4.24.0
 importlib-metadata==0.17
 more-itertools==7.0.0
-numpy==1.16.4
+numpy==1.22.0
 packaging==19.0
 pandas==0.24.2
 pluggy==0.12.0
